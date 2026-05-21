@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Flight Management </title>
+    </head>
+    <body>
+        <h1>Bienvenido al Gestor de vuelos</h1>
+        <p th:text="${mensaje}"></p>
+        <p th:text="${mensajeDesdeProperties}"></p>
+        <hr>
+        <b>CEDULA: </b><span th:text="${usuario.cedula}"></span><br>
+        <b>CLAVE: </b><span th:text="${usuario.clave}"></span><br>
+        <b>NOMBRE: </b><span th:text="${usuario.nombre}"></span><br>
+        <b>EMAIL: </b><span th:text="${usuario.email}"></span><br>
+    </body>
+</html>
