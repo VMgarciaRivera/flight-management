@@ -6,5 +6,31 @@
     </head>
     <body>
        <h1>Bienvenido al Gestor de vuelos</h1>
+       <a th:href="@{/agregar}">Agregar usuario</a>
+    <h4>Usuarios registrados</h4>
+    <hr>
+    <div th:if="${listaUsuarios != null and !listaUsuarios.empty}">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Cedula</th>
+                    <th>Clave</th>
+                    <th>Nombre</th>
+                    <th>Email</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario : ${listaUsuarios}">
+                    <td th:text="${usuario.cedula}">Cedula del usuario</td>
+                    <td th:text="${usuario.clave}">Clave del usuario</td>
+                    <td th:text="${usuario.nombre}">Nombre del usuario</td>
+                    <td th:text="${usuario.email}">Email del usuario</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div th:if="${listaUsuarios == null or listaUsuarios.empty}">
+        <p>No hay usuarios registrados.</p>
+    </div>
     </body>
 </html>
