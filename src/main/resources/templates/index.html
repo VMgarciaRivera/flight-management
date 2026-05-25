@@ -17,6 +17,7 @@
                     <th>Clave</th>
                     <th>Nombre</th>
                     <th>Email</th>
+                    <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
@@ -25,6 +26,10 @@
                     <td th:text="${usuario.clave}">Clave del usuario</td>
                     <td th:text="${usuario.nombre}">Nombre del usuario</td>
                     <td th:text="${usuario.email}">Email del usuario</td>
+                    <td>
+                        <a th:href="@{/editar/{cedula}(cedula=${usuario.cedula})}" th:text="EDITAR"></a>
+                        <a th:href="@{/eliminar/{cedula}(cedula=${usuario.cedula})}" th:text="ELIMINAR"></a>
+                    </td>
                 </tr>
             </tbody>
         </table>
