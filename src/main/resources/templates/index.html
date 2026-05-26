@@ -5,6 +5,7 @@
         <title>Flight Management </title>
     </head>
     <body>
+    <header th:replace="plantillas/partes :: cabecero"></header>
        <h1>Bienvenido al Gestor de vuelos</h1>
        <a th:href="@{/agregar}">Agregar usuario</a>
     <h4>Usuarios registrados</h4>
@@ -36,6 +37,7 @@
     </div>
     <div th:if="${listaUsuarios == null or listaUsuarios.empty}">
         <p>No hay usuarios registrados.</p>
-    </div>
+    </div> <br/> <hr/>
+    <footer th:replace="plantillas/partes :: piepagina"></footer>
     </body>
 </html>
