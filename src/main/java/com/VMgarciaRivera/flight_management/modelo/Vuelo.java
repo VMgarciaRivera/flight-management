@@ -6,9 +6,11 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
@@ -26,16 +28,19 @@ public class Vuelo implements Serializable {
     private UUID id;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(name = "fecha_compra", nullable = false)
-    private ZonedDateTime fechaCompra;
+    private LocalDateTime fechaCompra;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(name = "fecha_salida", nullable = false)
-    private ZonedDateTime fechaSalida;
+    private LocalDateTime fechaSalida;
 
     @NotNull
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(name = "fecha_llegada", nullable = false)
-    private ZonedDateTime fechaLlegada;
+    private LocalDateTime fechaLlegada;
 
     @NotBlank
     @Column(name = "agencia_viajes")
