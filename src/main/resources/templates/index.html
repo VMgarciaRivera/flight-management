@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <head>
         <meta charset="UTF-8">
@@ -7,8 +6,8 @@
     <body>
     <header th:replace="plantillas/partes :: cabecero"></header>
        <h1>Bienvenido al Gestor de vuelos</h1>
-       <a th:href="@{/agregar}">Agregar usuario</a>
     <h4>Usuarios registrados</h4>
+    <a th:href="@{/agregar}">Agregar usuario</a>
     <hr>
     <div th:if="${listaUsuarios != null and !listaUsuarios.empty}">
         <table border="1">
@@ -38,6 +37,58 @@
     <div th:if="${listaUsuarios == null or listaUsuarios.empty}">
         <p>No hay usuarios registrados.</p>
     </div> <br/> <hr/>
+    <h4>Vuelos registrados</h4>
+    <a th:href="@{/vuelos/agregar}">Agregar vuelo</a>
+    <div th:if="${listaVuelos != null and !listaVuelos.empty}">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Numero</th>
+                    <th>Aerolinea</th>
+                    <th>Aeropuerto Salida</th>
+                    <th>Aeropuerto Llegada</th>
+                    <th>Agencia Viajes</th>
+                    <th>Avion</th>
+                    <th>Fecha Salida</th>
+                    <th>Fecha Llegada</th>
+                    <th>Fecha Compra</th>
+                    <th>Cliente</th>
+                    <th>Piloto</th>
+                    <th>Estado</th>
+                    <th>Valor</th>
+                    <th>Puesto</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="vuelo : ${listaVuelos}">
+                    <td th:text="${vuelo.numero}">Numero del vuelo</td>
+                    <td th:text="${vuelo.aerolinea}">Aerolinea</td>
+                    <td th:text="${vuelo.aeropuertoSalida}">Aeropuerto Salida</td>
+                    <td th:text="${vuelo.aeropuertoLlegada}">Aeropuerto Llegada</td>
+                    <td th:text="${vuelo.agenciaViajes}">Agencia Viajes</td>
+                    <td th:text="${vuelo.avion}">Avion</td>
+                    <td th:text="${#temporals.format(vuelo.fechaSalida, 'dd/MM/yyyy HH:mm')}">Fecha Salida</td>
+                    <td th:text="${#temporals.format(vuelo.fechaLlegada, 'dd/MM/yyyy HH:mm')}">Fecha Llegada</td>
+                    <td th:text="${#temporals.format(vuelo.fechaCompra, 'dd/MM/yyyy HH:mm')}">Fecha Compra</td>
+                    <td th:text="${vuelo.cliente}">Cliente</td>
+                    <td th:text="${vuelo.piloto}">Piloto</td>
+                    <td th:text="${vuelo.estado}">Estado</td>
+                    <td th:text="${vuelo.valor}">Valor</td>
+                    <td th:text="${vuelo.puesto}">Puesto</td>
+                    <td>
+                        <a th:href="@{/vuelos/editar/{id}(id=${vuelo.id})}" th:text="EDITAR"></a>
+                        <a th:href="@{/vuelos/eliminar/{id}(id=${vuelo.id})}" th:text="ELIMINAR"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <br/> <hr/>
+    <div th:if="${listaVuelos == null or listaVuelos.empty}">
+        <p>No hay vuelos registrados.</p>
+
+    </div>
     <footer th:replace="plantillas/partes :: piepagina"></footer>
     </body>
 </html>
