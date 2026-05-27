@@ -64,9 +64,8 @@ flight-management/
 - **Java 11+**: Lenguaje de programación
 - **Spring Boot**: Framework web
 - **Spring Data JPA**: Acceso a datos
-- **MySQL/H2**: Base de datos
+- **postgreSQL**: Base de datos
 - **Thymeleaf**: Motor de plantillas HTML
-- **Bootstrap/CSS**: Estilos y diseño responsivo
 - **Maven**: Gestor de dependencias
 
 ## 📦 Dependencias Principales
@@ -76,7 +75,7 @@ Las dependencias necesarias se han instalado en el archivo `pom.xml`:
 - `spring-boot-starter-web`: Desarrollo web
 - `spring-boot-starter-data-jpa`: Acceso a datos
 - `spring-boot-starter-thymeleaf`: Motor de plantillas
-- `mysql-connector-java`: Driver MySQL
+- `org.postgresql`: Driver PostgreSQL
 - `spring-boot-devtools`: Herramientas de desarrollo
 
 ## ⚙️ Configuración del Proyecto
@@ -84,19 +83,30 @@ Las dependencias necesarias se han instalado en el archivo `pom.xml`:
 ### 1. Archivo `application.properties`
 
 ```properties
-# Configuración de la base de datos
-spring.datasource.url=jdbc:mysql://localhost:3306/flight_db
-spring.datasource.username=root
-spring.datasource.password=your_password
-spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+spring.application.name=flight-management
 
-# Configuración de JPA/Hibernate
+# ACTUALIZAR AUTOMATICAMENTE CUANDO GUARDEMOS LOS CAMBIOS
+spring.thymeleaf.cache=false
+
+# CAMBIAR EL PUERTO DEL SERVIDOR
+server.port=8080
+
+# QUITAR EL BANNER Y LOGO DE SPRING DEL LOG
+spring.main.banner-mode=off
+
+# PARAMETROS DE CONEXION A LA BD (POSTGRESQL)
+spring.datasource.url=jdbc:postgresql://localhost:5432/flight_management
+spring.datasource.username=postgres
+spring.datasource.password=12345
+
+# CONFIGURACION DE HIBERNATE / ORM
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL8Dialect
 
-# Puerto del servidor
-server.port=8080
+# ESTO ES PARA PODER VER EN EL LOG EL SQL QUE SE HA GENERADO EN CADA OPERACION
+spring.jpa.properties.hibernate.format_sql=true
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE
 ```
 
 ### 2. Instalación de Dependencias
@@ -140,40 +150,41 @@ mvn spring-boot:run
 
 **CRUD Vuelo**: Implementado siguiendo el mismo patrón del CRUD de usuarios.
 
-## 🚀 Funcionalidades Principales
+## Funcionalidades Principales
 
 ### CRUD Usuario
-- ✅ **Crear**: Agregar nuevos usuarios con validación
-- ✅ **Leer**: Listar todos los usuarios
-- ✅ **Actualizar**: Modificar datos del usuario
-- ✅ **Eliminar**: Remover usuarios de la base de datos
+- **Crear**: Agregar nuevos usuarios con validación
+- **Leer**: Listar todos los usuarios
+- **Actualizar**: Modificar datos del usuario
+- **Eliminar**: Remover usuarios de la base de datos
 
 ### CRUD Vuelo
-- ✅ **Crear**: Agregar nuevos vuelos
-- ✅ **Leer**: Listar todos los vuelos con opciones de filtrado
-- ✅ **Actualizar**: Modificar información del vuelo
-- ✅ **Eliminar**: Remover vuelos
+- **Crear**: Agregar nuevos vuelos
+- **Leer**: Listar todos los vuelos con opciones de filtrado
+- **Actualizar**: Modificar información del vuelo
+- **Eliminar**: Remover vuelos
 
-## 🏛️ Arquitectura Limpia: Contratos, Interfaces y Separación de Responsabilidades
+## Arquitectura Limpia: Contratos, Interfaces y Separación de Responsabilidades
 
 Este proyecto implementa principios fundamentales de **arquitectura limpia** para garantizar código mantenible, testeable y escalable.
 
-### 🤝 Contratos mediante Interfaces
+### Contratos mediante Interfaces
 
 El proyecto utiliza **interfaces** como contratos que definen las responsabilidades de cada capa:
 
 #### 1. **Repository Interfaces**
 ```java
 // Contrato para acceso a datos
-public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
-    Usuario findByEmail(String email);
-    List<Usuario> findAll();
+@Repository
+public interface IUsuarioCrud extends CrudRepository<Usuario, String> {
+
 }
 
-public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
-    List<Vuelo> findByOrigen(String origen);
-    List<Vuelo> findByDestino(String destino);
+@Repository
+public interface VueloRepository extends JpaRepository<Vuelo, UUID> {
+
 }
+
 ```
 - Define operaciones de acceso a datos sin exponer implementación
 - Facilita cambios en la fuente de datos (MySQL → MongoDB, etc.)
@@ -182,27 +193,26 @@ public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
 #### 2. **Service Interfaces**
 ```java
 // Contrato para lógica de negocio
-public interface UsuarioService {
-    Usuario crearUsuario(Usuario usuario);
-    Usuario obtenerPorId(Integer id);
-    List<Usuario> listarTodos();
-    Usuario actualizar(Integer id, Usuario usuario);
-    void eliminar(Integer id);
+public interface IUsuarioServicio {
+    public List<Usuario> listarUsuarios();
+    public void guardar (Usuario usuario);
+    public void eliminar (Usuario usuario);
+    public Usuario encontrarUsuario(Usuario usuario);
 }
 
 public interface VueloService {
-    Vuelo crearVuelo(Vuelo vuelo);
-    List<Vuelo> listarVuelos();
-    Vuelo actualizarVuelo(Integer id, Vuelo vuelo);
-    void eliminarVuelo(Integer id);
-    List<Vuelo> buscarVuelosPorRuta(String origen, String destino);
+    Optional<Vuelo> findById(UUID id);
+    List<Vuelo> findAll();
+    Vuelo save(Vuelo vuelo);
+    void deleteById(UUID id);
 }
+
 ```
 - Separa contrato de implementación
 - Permite múltiples implementaciones si es necesario
 - Facilita inyección de dependencias
 
-### 🎯 Separación de Responsabilidades
+### Separación de Responsabilidades
 
 Cada capa tiene una responsabilidad clara y específica:
 
@@ -214,7 +224,7 @@ Cada capa tiene una responsabilidad clara y específica:
 | **Controller** | Gestionar peticiones HTTP y respuestas | Recibir requests, delegar a service, retornar responses |
 | **View** | Presentación de datos al usuario | Templates HTML renderizados con Thymeleaf |
 
-### 📋 Flujo de Datos en Arquitectura Limpia
+### Flujo de Datos en Arquitectura Limpia
 
 ```
 Cliente HTTP
@@ -229,10 +239,10 @@ Repository Interface (contrato de datos)
     ↓
 Repository Implementation (persiste en BD)
     ↓
-Database (MySQL)
+Database 
 ```
 
-### ✅ Beneficios de esta Arquitectura
+###  Beneficios de esta Arquitectura
 
 1. **Independencia de Frameworks**: La lógica de negocio no depende de Spring
 2. **Testabilidad**: Cada capa se prueba independientemente con mocks
@@ -241,7 +251,7 @@ Database (MySQL)
 5. **Reutilización**: Services pueden ser usados por múltiples controllers
 6. **Flexibilidad**: Cambiar BD, agregar caché, etc. sin tocar lógica de negocio
 
-### 💡 Ejemplo Práctico: Creación de Vuelo
+### Ejemplo Práctico: Creación de Vuelo
 
 ```java
 // Controller - Punto de entrada
@@ -268,66 +278,25 @@ public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
 }
 ```
 
-## 🎨 Estilos CSS
-
-Se han aplicado estilos Bootstrap y CSS personalizado para mejorar la experiencia del usuario:
-- Formularios responsive
-- Tablas con diseño moderno
-- Botones con efectos hover
-- Notificaciones de éxito/error
-
-## 📝 Flujo Git/GitHub
-
-Se siguió un flujo de trabajo estructurado:
-
-```bash
-# Crear rama para nueva funcionalidad
-git checkout -b feature/nombre-feature
-
-# Commits modulares y descriptivos
-git commit -m "Agregar modelo Usuario"
-git commit -m "Implementar repositorio Usuario"
-git commit -m "Crear controlador Usuario"
-git commit -m "Agregar vistas HTML para Usuario"
-
-# Push con máximo 10 archivos
-git push origin feature/nombre-feature
-```
-
-Cada rama representa una funcionalidad específica y se han realizado commits pequeños y descriptivos para mantener un historial limpio.
-
-## 🎥 Video de Sustentación
-
-Se adjunta un video que demuestra:
-- La estructura y configuración del proyecto
-- El funcionamiento completo del **CRUD de Usuarios** (basado en guías)
-- El funcionamiento completo del **CRUD de Vuelos** (tabla asignada)
-- Las operaciones básicas y casos de uso
-
-## 📚 Referencias
+## Referencias
 
 - Guías de Spring Boot proporcionadas por el profesor
 - Documentación oficial de [Spring Boot](https://spring.io/projects/spring-boot)
 - Documentación de [Spring Data JPA](https://spring.io/projects/spring-data-jpa)
 - [Thymeleaf](https://www.thymeleaf.org/) - Motor de plantillas
 
-## ✍️ Autor
+## Autor
 
 **VMgarciaRivera**
-
-## 📅 Fecha de Realización
-
-2026 - Actividad Académica
-
 ---
 
 ### Notas Importantes
 
-- ✅ El CRUD de usuarios se implementó exactamente como se especificó en las guías del profesor
-- ✅ La configuración del proyecto (`application.properties`) y las dependencias (`pom.xml`) siguen las instrucciones de las guías
-- ✅ El CRUD de vuelos se desarrolló replicando la misma estructura y modelo del CRUD de usuarios
-- ✅ Se han realizado commits pequeños y modulares en ramas separadas
-- ✅ Todos los archivos relacionados con usuarios provienen de las guías del profesor
-- ✅ Se implementó arquitectura limpia con interfaces de contratos para Repository y Service
-- ✅ Se separaron claramente las responsabilidades en cada capa (Model, Repository, Service, Controller, View)
-- ✅ El código sigue principios SOLID para mayor mantenibilidad y testabilidad
+-  El CRUD de usuarios se implementó exactamente como se especificó en las guías del profesor
+-  La configuración del proyecto (`application.properties`) y las dependencias (`pom.xml`) siguen las instrucciones de las guías
+-  El CRUD de vuelos se desarrolló replicando la misma estructura y modelo del CRUD de usuarios
+-  Se han realizado commits pequeños y modulares en ramas separadas
+-  Todos los archivos relacionados con usuarios provienen de las guías del profesor
+-  Se implementó arquitectura limpia con interfaces de contratos para Repository y Service
+-  Se separaron claramente las responsabilidades en cada capa (Model, Repository, Service, Controller, View)
+-  El código sigue principios SOLID para mayor mantenibilidad y testabilidad
