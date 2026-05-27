@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Modificar Vuelo</title>
+</head>
+<body>
+<h1>Datos Del Vuelo</h1>
+<a th:href="@{/}">Volver</a>
+<br/>
+<form th:action="@{/vuelos/crear}" method="POST" th:object="${vuelo}">
+    <br/>
+    <label for="numero">NUMERO:</label>
+    <input type="text" name="numero" th:field="*{numero}"/>
+    <span th:if="${#fields.hasErrors('numero')}" th:errors="*{numero}">El numero es requerido</span>
+    <br/>
+    <label for="aerolinea">AEROLINEA:</label>
+    <input type="text" name="aerolinea" th:field="*{aerolinea}"/>
+    <span th:if="${#fields.hasErrors('aerolinea')}" th:errors="*{aerolinea}">La aerolinea es requerida</span>
+    <br/>
+    <label for="aeropuertoSalida">AEROPUERTO SALIDA:</label>
+    <input type="text" name="aeropuertoSalida" th:field="*{aeropuertoSalida}"/>
+    <span th:if="${#fields.hasErrors('aeropuertoSalida')}" th:errors="*{aeropuertoSalida}">El aeropuerto de salida es requerido</span>
+    <br/>
+    <label for="aeropuertoLlegada">AEROPUERTO LLEGADA:</label>
+    <input type="text" name="aeropuertoLlegada" th:field="*{aeropuertoLlegada}"/>
+    <span th:if="${#fields.hasErrors('aeropuertoLlegada')}" th:errors="*{aeropuertoLlegada}">El aeropuerto de llegada es requerido</span>
+    <br/>
+    <label for="fechaSalida">FECHA SALIDA:</label>
+    <input type="datetime-local" name="fechaSalida" th:field="*{fechaSalida}"/>
+    <span th:if="${#fields.hasErrors('fechaSalida')}" th:errors="*{fechaSalida}">La fecha de salida es requerida</span>
+    <br/>
+    <label for="fechaLlegada">FECHA LLEGADA:</label>
+    <input type="datetime-local" name="fechaLlegada" th:field="*{fechaLlegada}"/>
+    <span th:if="${#fields.hasErrors('fechaLlegada')}" th:errors="*{fechaLlegada}">La fecha de llegada es requerida</span>
+    <br/>
+    <label for="fechaCompra">FECHA COMPRA:</label>
+    <input type="datetime-local" name="fechaCompra" th:field="*{fechaCompra}"/>
+    <span th:if="${#fields.hasErrors('fechaCompra')}" th:errors="*{fechaCompra}">La fecha de compra es requerida</span>
+    <br/>
+    <label for="agenciaViajes">AGENCIA VIAJES:</label>
+    <input type="text" name="agenciaViajes" th:field="*{agenciaViajes}"/>
+    <span th:if="${#fields.hasErrors('agenciaViajes')}" th:errors="*{agenciaViajes}">La agencia de viajes es requerida</span>
+    <br/>
+    <label for="estado">ESTADO:</label>
+    <input type="text" name="estado" th:field="*{estado}"/>
+    <span th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}">El estado es requerido</span>
+    <br/>
+    <label for="valor">VALOR:</label>
+    <input type="number" name="valor" step="0.01" th:field="*{valor}"/>
+    <span th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}">El valor es requerido</span>
+    <br/>
+    <label for="cliente">CLIENTE:</label>
+    <input type="text" name="cliente" th:field="*{cliente}"/>
+    <span th:if="${#fields.hasErrors('cliente')}" th:errors="*{cliente}">El cliente es requerido</span>
+    <br/>
+    <label for="puesto">PUESTO:</label>
+    <input type="text" name="puesto" th:field="*{puesto}"/>
+    <span th:if="${#fields.hasErrors('puesto')}" th:errors="*{puesto}">El puesto es requerido</span>
+    <br/>
+    <label for="avion">AVION:</label>
+    <input type="text" name="avion" th:field="*{avion}"/>
+    <span th:if="${#fields.hasErrors('avion')}" th:errors="*{avion}">El avión es requerido</span>
+    <br/>
+    <label for="piloto">PILOTO:</label>
+    <input type="text" name="piloto" th:field="*{piloto}"/>
+    <span th:if="${#fields.hasErrors('piloto')}" th:errors="*{piloto}">El piloto es requerido</span>
+    <br/>
+    <input type="reset" value="LIMPIAR"/> &nbsp;&nbsp;&nbsp;
+    <input type="submit" name="guardar" value="GUARDAR"/>
+    <br/>
+</form>
+</body>
+</html>
