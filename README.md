@@ -4,7 +4,7 @@
 
 ## 📋 Descripción del Proyecto
 
-Este proyecto es una aplicación web educativa que replica y expande el modelo de sistemas de vuelo desarrollado en la Unidad 1 (PHP). La aplicación implementa un **CRUD completo** para la gestión de usuarios y vuelos, aplicando buenas prácticas de desarrollo web moderno.
+Este proyecto es una aplicación web educativa que replica y expande el modelo de sistemas de vuelo desarrollado en la Unidad 1 (PHP). La aplicación implementa un **CRUD completo** para la gestión de vuelos siguiendo principios de **arquitectura limpia**.
 
 ## 🎯 Objetivos de la Actividad
 
@@ -154,6 +154,120 @@ mvn spring-boot:run
 - ✅ **Actualizar**: Modificar información del vuelo
 - ✅ **Eliminar**: Remover vuelos
 
+## 🏛️ Arquitectura Limpia: Contratos, Interfaces y Separación de Responsabilidades
+
+Este proyecto implementa principios fundamentales de **arquitectura limpia** para garantizar código mantenible, testeable y escalable.
+
+### 🤝 Contratos mediante Interfaces
+
+El proyecto utiliza **interfaces** como contratos que definen las responsabilidades de cada capa:
+
+#### 1. **Repository Interfaces**
+```java
+// Contrato para acceso a datos
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    Usuario findByEmail(String email);
+    List<Usuario> findAll();
+}
+
+public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
+    List<Vuelo> findByOrigen(String origen);
+    List<Vuelo> findByDestino(String destino);
+}
+```
+- Define operaciones de acceso a datos sin exponer implementación
+- Facilita cambios en la fuente de datos (MySQL → MongoDB, etc.)
+- Permite testing sin acceso real a BD
+
+#### 2. **Service Interfaces**
+```java
+// Contrato para lógica de negocio
+public interface UsuarioService {
+    Usuario crearUsuario(Usuario usuario);
+    Usuario obtenerPorId(Integer id);
+    List<Usuario> listarTodos();
+    Usuario actualizar(Integer id, Usuario usuario);
+    void eliminar(Integer id);
+}
+
+public interface VueloService {
+    Vuelo crearVuelo(Vuelo vuelo);
+    List<Vuelo> listarVuelos();
+    Vuelo actualizarVuelo(Integer id, Vuelo vuelo);
+    void eliminarVuelo(Integer id);
+    List<Vuelo> buscarVuelosPorRuta(String origen, String destino);
+}
+```
+- Separa contrato de implementación
+- Permite múltiples implementaciones si es necesario
+- Facilita inyección de dependencias
+
+### 🎯 Separación de Responsabilidades
+
+Cada capa tiene una responsabilidad clara y específica:
+
+| Capa | Responsabilidad | Ejemplo |
+|------|-----------------|---------|
+| **Model** | Representar entidades del dominio | `Usuario`, `Vuelo` (atributos + anotaciones JPA) |
+| **Repository** | Acceso a datos y persistencia | Consultas a BD, CRUD de bajo nivel |
+| **Service** | Lógica de negocio y validaciones | Validar datos, aplicar reglas, orquestar operaciones |
+| **Controller** | Gestionar peticiones HTTP y respuestas | Recibir requests, delegar a service, retornar responses |
+| **View** | Presentación de datos al usuario | Templates HTML renderizados con Thymeleaf |
+
+### 📋 Flujo de Datos en Arquitectura Limpia
+
+```
+Cliente HTTP
+    ↓
+Controller (recibe y valida entrada)
+    ↓
+Service Interface (contrato de lógica)
+    ↓
+Service Implementation (ejecuta lógica de negocio)
+    ↓
+Repository Interface (contrato de datos)
+    ↓
+Repository Implementation (persiste en BD)
+    ↓
+Database (MySQL)
+```
+
+### ✅ Beneficios de esta Arquitectura
+
+1. **Independencia de Frameworks**: La lógica de negocio no depende de Spring
+2. **Testabilidad**: Cada capa se prueba independientemente con mocks
+3. **Mantenibilidad**: Cambios en una capa no afectan otras
+4. **Escalabilidad**: Fácil agregar nuevas funcionalidades
+5. **Reutilización**: Services pueden ser usados por múltiples controllers
+6. **Flexibilidad**: Cambiar BD, agregar caché, etc. sin tocar lógica de negocio
+
+### 💡 Ejemplo Práctico: Creación de Vuelo
+
+```java
+// Controller - Punto de entrada
+@PostMapping("/create")
+public String crearVuelo(@ModelAttribute Vuelo vuelo) {
+    vueloService.crearVuelo(vuelo);  // Delega a service
+    return "redirect:/vuelos";
+}
+
+// Service - Lógica de negocio
+@Service
+public class VueloServiceImpl implements VueloService {
+    @Override
+    public Vuelo crearVuelo(Vuelo vuelo) {
+        validarVuelo(vuelo);  // Valida
+        calcularPrecio(vuelo); // Lógica
+        return vueloRepository.save(vuelo);  // Persiste
+    }
+}
+
+// Repository - Acceso a datos
+public interface VueloRepository extends JpaRepository<Vuelo, Integer> {
+    // Spring Data JPA implementa automáticamente
+}
+```
+
 ## 🎨 Estilos CSS
 
 Se han aplicado estilos Bootstrap y CSS personalizado para mejorar la experiencia del usuario:
@@ -214,4 +328,6 @@ Se adjunta un video que demuestra:
 - ✅ El CRUD de vuelos se desarrolló replicando la misma estructura y modelo del CRUD de usuarios
 - ✅ Se han realizado commits pequeños y modulares en ramas separadas
 - ✅ Todos los archivos relacionados con usuarios provienen de las guías del profesor
-
+- ✅ Se implementó arquitectura limpia con interfaces de contratos para Repository y Service
+- ✅ Se separaron claramente las responsabilidades en cada capa (Model, Repository, Service, Controller, View)
+- ✅ El código sigue principios SOLID para mayor mantenibilidad y testabilidad
